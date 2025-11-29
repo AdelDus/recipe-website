@@ -1,0 +1,144 @@
+{% extends 'game/base.html' %}
+
+{% block title %}{{ recipe.title }} - Сайт рецептов{% endblock %}
+
+{% block content %}
+<style>
+    .recipe-detail {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .recipe-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .recipe-header h2 {
+        color: #333;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+    .recipe-image {
+        width: 100%;
+        max-width: 600px;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin: 20px auto;
+        display: block;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .recipe-meta {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 20px 0;
+        font-size: 1.1em;
+        color: #666;
+    }
+    .recipe-description {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #555;
+        margin: 20px 0;
+        text-align: center;
+    }
+    .section {
+        margin: 30px 0;
+    }
+    .section h3 {
+        color: #667eea;
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 10px;
+    }
+    .ingredients-list {
+        list-style: none;
+        padding: 0;
+    }
+    .ingredients-list li {
+        padding: 10px;
+        margin: 5px 0;
+        background: #f9f9f9;
+        border-left: 4px solid #667eea;
+        border-radius: 5px;
+    }
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        counter-reset: step-counter;
+    }
+    .steps-list li {
+        counter-increment: step-counter;
+        padding: 15px;
+        margin: 15px 0;
+        background: #f9f9f9;
+        border-radius: 5px;
+        position: relative;
+        padding-left: 60px;
+    }
+    .steps-list li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 15px;
+        top: 15px;
+        background: #667eea;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 1.1em;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<a href="{% url 'home' %}" class="back-link">← Вернуться к списку рецептов</a>
+
+<div class="recipe-detail">
+    <div class="recipe-header">
+        <h2>{{ recipe.title }}</h2>
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
+        <div class="recipe-meta">
+            <span>⏱️ Время: {{ recipe.cooking_time }} минут</span>
+            <span>🍽️ Порций: {{ recipe.servings }}</span>
+        </div>
+        <p class="recipe-description">{{ recipe.description }}</p>
+    </div>
+
+    <div class="section">
+        <h3>📝 Ингредиенты</h3>
+        <ul class="ingredients-list">
+            {% for ingredient in ingredients %}
+                <li>{{ ingredient.name }} — {{ ingredient.quantity }} {{ ingredient.unit }}</li>
+            {% empty %}
+                <li>Ингредиенты не указаны</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h3>👨‍🍳 Пошаговая инструкция</h3>
+        <ul class="steps-list">
+            {% for step in steps %}
+                <li>{{ step.instruction }}</li>
+            {% empty %}
+                <li>Инструкции не указаны</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

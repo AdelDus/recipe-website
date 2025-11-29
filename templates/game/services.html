@@ -1,0 +1,14 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<h1>Услуги и цены</h1>
+<div class="pure-g">
+    {% for service in services %}
+    <div class="pure-u-1-2">
+        <h3>{{ service.name }}</h3>
+        <p>{{ service.description }}</p>
+        <strong>Цена: {{ service.price }} руб.</strong>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
