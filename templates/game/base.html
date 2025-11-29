@@ -12,8 +12,15 @@
         <h1>🍳 Кулинарная книга</h1>
         <nav>
             <a href="{% url 'home' %}">Главная</a>
+            <a href="{% url 'favorites' %}">⭐ Избранное</a>
             <a href="{% url 'about' %}">О проекте</a>
         </nav>
+        <div class="search-container">
+            <form method="get" action="{% url 'home' %}" class="search-form">
+                <input type="text" name="q" placeholder="🔍 Поиск рецептов..." value="{{ search_query|default:'' }}" class="search-input">
+                <button type="submit" class="search-button">Найти</button>
+            </form>
+        </div>
     </header>
     <main>
         {% block content %}{% endblock %}

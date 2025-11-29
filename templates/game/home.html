@@ -3,10 +3,35 @@
 {% block title %}Главная - Сайт рецептов{% endblock %}
 
 {% block content %}
-<h2>Все рецепты</h2>
+<h2>
+    {% if search_query %}
+        🔍 Результаты поиска: "{{ search_query }}"
+    {% elif selected_category %}
+        {{ selected_category.icon }} {{ selected_category.name }}
+    {% else %}
+        Все рецепты
+    {% endif %}
+</h2>
+
+<div class="category-filter">
+    <a href="{% url 'home' %}" class="category-btn {% if not selected_category %}active{% endif %}">
+        🍽️ Все рецепты
+    </a>
+    {% for category in categories %}
+        <a href="?category={{ category.id }}" class="category-btn {% if selected_category.id == category.id %}active{% endif %}">
+            {{ category.icon }} {{ category.name }}
+        </a>
+    {% endfor %}
+</div>
+
 <div class="recipe-gallery">
     {% for recipe in recipes %}
         <div class="recipe-card">
+            <button class="favorite-btn {% if recipe.id in favorite_ids %}active{% endif %}" 
+                    data-recipe-id="{{ recipe.id }}"
+                    title="{% if recipe.id in favorite_ids %}Удалить из избранного{% else %}Добавить в избранное{% endif %}">
+                ⭐
+            </button>
             <a href="{% url 'recipe_detail' recipe.id %}">
                 <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
                 <h3>{{ recipe.title }}</h3>
@@ -18,7 +43,40 @@
             </div>
         </div>
     {% empty %}
-        <p style="grid-column: 1/-1; text-align: center; color: #666;">Рецептов пока нет. Добавьте первый рецепт через админ-панель!</p>
+        <p style="grid-column: 1/-1; text-align: center; color: #666;">
+            {% if search_query %}
+                По запросу "{{ search_query }}" ничего не найдено. Попробуйте другой запрос.
+            {% else %}
+                Рецептов пока нет. Добавьте первый рецепт через админ-панель!
+            {% endif %}
+        </p>
     {% endfor %}
 </div>
+
+<script>
+// AJAX для избранного
+document.querySelectorAll('.favorite-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const recipeId = this.dataset.recipeId;
+        const url = `/recipe/${recipeId}/favorite/`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.classList.toggle('active');
+            this.title = data.is_favorite ? 'Удалить из избранного' : 'Добавить в избранное';
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
 {% endblock %}

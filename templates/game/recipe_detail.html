@@ -8,6 +8,13 @@
 <div class="recipe-detail">
     <div class="recipe-header">
         <h2>{{ recipe.title }}</h2>
+        {% if recipe.category %}
+            <div class="recipe-category">
+                <a href="{% url 'home' %}?category={{ recipe.category.id }}">
+                    {{ recipe.category.icon }} {{ recipe.category.name }}
+                </a>
+            </div>
+        {% endif %}
         <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
         <div class="recipe-meta">
             <span>⏱️ Время: {{ recipe.cooking_time }} минут</span>
@@ -15,14 +22,21 @@
         </div>
         <p class="recipe-description">{{ recipe.description }}</p>
         
-        <form method="post" action="{% url 'like_recipe' recipe.id %}" id="like-form" style="text-align: center;">
-            {% csrf_token %}
-            <button type="submit" class="like-button">
-                <span>❤️</span>
-                <span>Нравится</span>
-                <span class="like-count" id="like-count">{{ recipe.likes }}</span>
+        <div style="text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <form method="post" action="{% url 'like_recipe' recipe.id %}" id="like-form">
+                {% csrf_token %}
+                <button type="submit" class="like-button">
+                    <span>❤️</span>
+                    <span>Нравится</span>
+                    <span class="like-count" id="like-count">{{ recipe.likes }}</span>
+                </button>
+            </form>
+            
+            <button class="favorite-button {% if is_favorite %}active{% endif %}" id="favorite-btn" data-recipe-id="{{ recipe.id }}">
+                <span>⭐</span>
+                <span id="favorite-text">{% if is_favorite %}В избранном{% else %}В избранное{% endif %}</span>
             </button>
-        </form>
+        </div>
     </div>
 
     <div class="section">
@@ -89,6 +103,7 @@
 </div>
 
 <script>
+// Лайки
 document.getElementById('like-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -106,6 +121,30 @@ document.getElementById('like-form').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         countElement.textContent = data.likes;
+        button.style.animation = 'pulse 0.3s';
+        setTimeout(() => button.style.animation = '', 300);
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+// Избранное
+document.getElementById('favorite-btn').addEventListener('click', function() {
+    const recipeId = this.dataset.recipeId;
+    const url = `/recipe/${recipeId}/favorite/`;
+    const button = this;
+    const textElement = document.getElementById('favorite-text');
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        button.classList.toggle('active');
+        textElement.textContent = data.is_favorite ? 'В избранном' : 'В избранное';
         button.style.animation = 'pulse 0.3s';
         setTimeout(() => button.style.animation = '', 300);
     })

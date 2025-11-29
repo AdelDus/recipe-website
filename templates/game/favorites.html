@@ -1,0 +1,74 @@
+{% extends 'game/base.html' %}
+
+{% block title %}Избранное - Сайт рецептов{% endblock %}
+
+{% block content %}
+<h2>⭐ Избранные рецепты</h2>
+
+<div class="recipe-gallery">
+    {% for recipe in recipes %}
+        <div class="recipe-card">
+            <button class="favorite-btn active" 
+                    data-recipe-id="{{ recipe.id }}"
+                    title="Удалить из избранного">
+                ⭐
+            </button>
+            <a href="{% url 'recipe_detail' recipe.id %}">
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                <h3>{{ recipe.title }}</h3>
+            </a>
+            <div class="recipe-info">
+                <span class="cooking-time">⏱️ {{ recipe.cooking_time }} мин</span>
+                <span class="servings">🍽️ {{ recipe.servings }} порций</span>
+                <span class="likes">❤️ {{ recipe.likes }}</span>
+            </div>
+        </div>
+    {% empty %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+            <p style="font-size: 3em; margin: 0;">⭐</p>
+            <h3 style="color: #666; margin: 20px 0;">У вас пока нет избранных рецептов</h3>
+            <p style="color: #999;">Добавляйте понравившиеся рецепты в избранное, нажимая на звездочку</p>
+            <a href="{% url 'home' %}" style="display: inline-block; margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 25px;">
+                Перейти к рецептам
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+// AJAX для удаления из избранного
+document.querySelectorAll('.favorite-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const recipeId = this.dataset.recipeId;
+        const url = `/recipe/${recipeId}/favorite/`;
+        const card = this.closest('.recipe-card');
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Удаляем карточку с анимацией
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                card.remove();
+                // Проверяем, остались ли рецепты
+                const gallery = document.querySelector('.recipe-gallery');
+                if (gallery.children.length === 0) {
+                    location.reload();
+                }
+            }, 300);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
+{% endblock %}

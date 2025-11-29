@@ -1,13 +1,47 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib import messages
-from .models import Recipe, Comment
+from django.db.models import Q
+from .models import Category, Recipe, Comment, Favorite
 
 
 def home(request):
     """Главная страница со списком рецептов"""
+    category_id = request.GET.get('category')
+    search_query = request.GET.get('q', '').strip()
+    categories = Category.objects.all()
+    
+    # Базовый queryset
     recipes = Recipe.objects.all()
-    return render(request, 'game/home.html', {'recipes': recipes})
+    
+    # Фильтрация по категории
+    if category_id:
+        recipes = recipes.filter(category_id=category_id)
+        selected_category = get_object_or_404(Category, id=category_id)
+    else:
+        selected_category = None
+    
+    # Поиск
+    if search_query:
+        recipes = recipes.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(ingredients__name__icontains=search_query)
+        ).distinct()
+    
+    # Получаем избранные рецепты для текущей сессии
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+    favorite_ids = Favorite.objects.filter(session_key=session_key).values_list('recipe_id', flat=True)
+    
+    return render(request, 'game/home.html', {
+        'recipes': recipes,
+        'categories': categories,
+        'selected_category': selected_category,
+        'search_query': search_query,
+        'favorite_ids': list(favorite_ids)
+    })
 
 
 def recipe_detail(request, recipe_id):
@@ -16,6 +50,12 @@ def recipe_detail(request, recipe_id):
     ingredients = recipe.ingredients.all()
     steps = recipe.steps.all()
     comments = recipe.comments.all()
+    
+    # Проверяем, в избранном ли рецепт
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+    is_favorite = Favorite.objects.filter(recipe=recipe, session_key=session_key).exists()
     
     if request.method == 'POST':
         author_name = request.POST.get('author_name', '').strip()
@@ -36,7 +76,8 @@ def recipe_detail(request, recipe_id):
         'recipe': recipe,
         'ingredients': ingredients,
         'steps': steps,
-        'comments': comments
+        'comments': comments,
+        'is_favorite': is_favorite
     })
 
 
@@ -49,6 +90,49 @@ def like_recipe(request, recipe_id):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({'likes': recipe.likes})
     return redirect('recipe_detail', recipe_id=recipe_id)
+
+
+def toggle_favorite(request, recipe_id):
+    """Добавить/удалить рецепт из избранного"""
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+    
+    favorite, created = Favorite.objects.get_or_create(
+        recipe=recipe,
+        session_key=session_key
+    )
+    
+    if not created:
+        favorite.delete()
+        is_favorite = False
+        message = 'Рецепт удален из избранного'
+    else:
+        is_favorite = True
+        message = 'Рецепт добавлен в избранное'
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'is_favorite': is_favorite, 'message': message})
+    
+    messages.success(request, message)
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+
+def favorites(request):
+    """Страница избранных рецептов"""
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+    
+    favorite_recipes = Recipe.objects.filter(
+        favorites__session_key=session_key
+    ).order_by('-favorites__created_at')
+    
+    return render(request, 'game/favorites.html', {
+        'recipes': favorite_recipes
+    })
 
 
 def about(request):
