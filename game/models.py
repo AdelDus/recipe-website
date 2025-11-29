@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Category(models.Model):
@@ -25,7 +26,8 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(verbose_name='Время приготовления (мин)')
     servings = models.IntegerField(default=1, verbose_name='Количество порций')
     image = models.ImageField(upload_to='recipes/', verbose_name='Изображение блюда')
-    author_name = models.CharField(max_length=100, default='Аноним', verbose_name='Автор')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes', verbose_name='Автор', null=True)
+    author_name = models.CharField(max_length=100, default='Аноним', verbose_name='Имя автора')
     is_approved = models.BooleanField(default=False, verbose_name='Одобрен')
     likes = models.IntegerField(default=0, verbose_name='Лайки')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
@@ -112,6 +114,7 @@ class CookingStep(models.Model):
 class Comment(models.Model):
     """Модель комментария"""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments', verbose_name='Рецепт')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', verbose_name='Автор', null=True)
     author_name = models.CharField(max_length=100, verbose_name='Имя автора')
     text = models.TextField(verbose_name='Текст комментария')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')

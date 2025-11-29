@@ -1,0 +1,57 @@
+{% extends "game/base.html" %}
+
+{% block title %}Подключенные аккаунты - Recipe Website{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 700px;">
+    <div class="auth-card">
+        <h2>🔗 Подключенные аккаунты</h2>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <p style="color: #666; margin-bottom: 30px;">
+            Управляйте подключенными социальными аккаунтами
+        </p>
+
+        {% if form.accounts %}
+            <form method="post" action="{% url 'socialaccount_connections' %}">
+                {% csrf_token %}
+
+                <div style="margin-bottom: 20px;">
+                    {% for base_account in form.accounts %}
+                        <div style="padding: 15px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #667eea;">{{ base_account.get_provider_account }}</strong>
+                                <br>
+                                <small style="color: #999;">{{ base_account.get_provider.name }}</small>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="account" value="{{ base_account.id }}" id="account_{{ base_account.id }}">
+                                <label for="account_{{ base_account.id }}" style="margin-left: 5px; color: #666;">Отключить</label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn-submit">Сохранить изменения</button>
+            </form>
+        {% else %}
+            <p style="text-align: center; color: #999; padding: 30px;">
+                У вас нет подключенных социальных аккаунтов
+            </p>
+        {% endif %}
+
+        <div class="auth-links">
+            <a href="{% url 'home' %}">← Вернуться на главную</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

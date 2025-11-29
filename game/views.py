@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Category, Recipe, Comment, Favorite
 
@@ -58,19 +59,23 @@ def recipe_detail(request, recipe_id):
     is_favorite = Favorite.objects.filter(recipe=recipe, session_key=session_key).exists()
     
     if request.method == 'POST':
-        author_name = request.POST.get('author_name', '').strip()
+        if not request.user.is_authenticated:
+            messages.error(request, 'Для добавления комментариев необходимо войти в систему.')
+            return redirect('account_login')
+        
         text = request.POST.get('text', '').strip()
         
-        if author_name and text:
+        if text:
             Comment.objects.create(
                 recipe=recipe,
-                author_name=author_name,
+                author=request.user,
+                author_name=request.user.get_full_name() or request.user.email,
                 text=text
             )
             messages.success(request, 'Комментарий успешно добавлен!')
             return redirect('recipe_detail', recipe_id=recipe_id)
         else:
-            messages.error(request, 'Пожалуйста, заполните все поля.')
+            messages.error(request, 'Пожалуйста, введите текст комментария.')
     
     return render(request, 'game/recipe_detail.html', {
         'recipe': recipe,
@@ -135,8 +140,9 @@ def favorites(request):
     })
 
 
+@login_required
 def add_recipe(request):
-    """Страница добавления рецепта"""
+    """Страница добавления рецепта (только для авторизованных)"""
     from .forms import RecipeForm, IngredientFormSet, CookingStepFormSet
     
     if request.method == 'POST':
@@ -144,6 +150,8 @@ def add_recipe(request):
         
         if recipe_form.is_valid():
             recipe = recipe_form.save(commit=False)
+            recipe.author = request.user  # Привязываем к пользователю
+            recipe.author_name = request.user.get_full_name() or request.user.email
             recipe.is_approved = False  # Требует модерации
             recipe.save()
             

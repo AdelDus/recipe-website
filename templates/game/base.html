@@ -5,16 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Сайт рецептов{% endblock %}</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/recipe-styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/recipe-styles.css' %}?v=4">
 </head>
 <body>
     <header>
         <h1>🍳 Кулинарная книга</h1>
         <nav>
             <a href="{% url 'home' %}">Главная</a>
-            <a href="{% url 'add_recipe' %}" class="add-recipe-link">➕ Добавить рецепт</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'add_recipe' %}" class="add-recipe-link">➕ Добавить рецепт</a>
+            {% endif %}
             <a href="{% url 'favorites' %}">⭐ Избранное</a>
             <a href="{% url 'about' %}">О проекте</a>
+            
+            {% if user.is_authenticated %}
+                <span class="user-info">👤 {{ user.email }}</span>
+                <a href="{% url 'account_logout' %}" class="logout-link">Выход</a>
+            {% else %}
+                <a href="{% url 'account_login' %}" class="login-link">🔐 Войти</a>
+            {% endif %}
         </nav>
         <div class="search-container">
             <form method="get" action="{% url 'home' %}" class="search-form">

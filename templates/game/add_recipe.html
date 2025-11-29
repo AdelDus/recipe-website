@@ -61,10 +61,6 @@
                 {% endif %}
             </div>
             
-            <div class="form-group">
-                <label for="{{ recipe_form.author_name.id_for_label }}">Ваше имя *</label>
-                {{ recipe_form.author_name }}
-            </div>
         </div>
         
         <div class="form-section">
@@ -128,8 +124,8 @@
 </div>
 
 <script>
-let ingredientCount = {{ ingredient_formset.total_form_count }};
-let stepCount = {{ step_formset.total_form_count }};
+let ingredientCount = {{ ingredient_formset.total_form_count|default:3 }};
+let stepCount = {{ step_formset.total_form_count|default:3 }};
 
 function addIngredient() {
     const container = document.getElementById('ingredient-forms');

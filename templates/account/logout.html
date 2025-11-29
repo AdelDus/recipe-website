@@ -1,0 +1,31 @@
+{% extends "game/base.html" %}
+
+{% block title %}Выход - Recipe Website{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>👋 Выход из системы</h2>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <p style="text-align: center; color: #666; margin: 20px 0;">
+            Вы уверены, что хотите выйти?
+        </p>
+
+        <form method="post" action="{% url 'account_logout' %}" class="auth-form">
+            {% csrf_token %}
+            <button type="submit" class="btn-submit">Да, выйти</button>
+            <a href="{% url 'home' %}" class="btn-cancel">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

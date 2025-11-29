@@ -7,7 +7,7 @@ class RecipeForm(forms.ModelForm):
     
     class Meta:
         model = Recipe
-        fields = ['title', 'description', 'category', 'cooking_time', 'servings', 'image', 'author_name']
+        fields = ['title', 'description', 'category', 'cooking_time', 'servings', 'image']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -30,10 +30,6 @@ class RecipeForm(forms.ModelForm):
                 'min': 1
             }),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
-            'author_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ваше имя'
-            }),
         }
 
 
