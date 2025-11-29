@@ -11,8 +11,8 @@ def home(request):
     search_query = request.GET.get('q', '').strip()
     categories = Category.objects.all()
     
-    # Базовый queryset
-    recipes = Recipe.objects.all()
+    # Базовый queryset - только одобренные рецепты
+    recipes = Recipe.objects.filter(is_approved=True)
     
     # Фильтрация по категории
     if category_id:
@@ -132,6 +132,46 @@ def favorites(request):
     
     return render(request, 'game/favorites.html', {
         'recipes': favorite_recipes
+    })
+
+
+def add_recipe(request):
+    """Страница добавления рецепта"""
+    from .forms import RecipeForm, IngredientFormSet, CookingStepFormSet
+    
+    if request.method == 'POST':
+        recipe_form = RecipeForm(request.POST, request.FILES)
+        
+        if recipe_form.is_valid():
+            recipe = recipe_form.save(commit=False)
+            recipe.is_approved = False  # Требует модерации
+            recipe.save()
+            
+            # Сохраняем ингредиенты
+            ingredient_formset = IngredientFormSet(request.POST, instance=recipe)
+            if ingredient_formset.is_valid():
+                ingredient_formset.save()
+            
+            # Сохраняем шаги
+            step_formset = CookingStepFormSet(request.POST, instance=recipe)
+            if step_formset.is_valid():
+                step_formset.save()
+            
+            messages.success(request, 'Рецепт отправлен на модерацию! После проверки он появится на сайте.')
+            return redirect('home')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+            ingredient_formset = IngredientFormSet(request.POST)
+            step_formset = CookingStepFormSet(request.POST)
+    else:
+        recipe_form = RecipeForm()
+        ingredient_formset = IngredientFormSet()
+        step_formset = CookingStepFormSet()
+    
+    return render(request, 'game/add_recipe.html', {
+        'recipe_form': recipe_form,
+        'ingredient_formset': ingredient_formset,
+        'step_formset': step_formset
     })
 
 

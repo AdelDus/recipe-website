@@ -25,11 +25,22 @@ class CookingStepInline(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'cooking_time', 'servings', 'likes', 'created_at']
-    list_filter = ['category', 'created_at']
-    search_fields = ['title', 'description']
+    list_display = ['title', 'author_name', 'category', 'is_approved', 'cooking_time', 'servings', 'likes', 'created_at']
+    list_filter = ['is_approved', 'category', 'created_at']
+    search_fields = ['title', 'description', 'author_name']
     readonly_fields = ['likes', 'created_at', 'updated_at']
     inlines = [IngredientInline, CookingStepInline]
+    actions = ['approve_recipes', 'reject_recipes']
+    
+    def approve_recipes(self, request, queryset):
+        updated = queryset.update(is_approved=True)
+        self.message_user(request, f'{updated} рецептов одобрено.')
+    approve_recipes.short_description = 'Одобрить выбранные рецепты'
+    
+    def reject_recipes(self, request, queryset):
+        updated = queryset.update(is_approved=False)
+        self.message_user(request, f'{updated} рецептов отклонено.')
+    reject_recipes.short_description = 'Отклонить выбранные рецепты'
 
 
 @admin.register(Ingredient)

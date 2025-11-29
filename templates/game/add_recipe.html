@@ -1,0 +1,175 @@
+{% extends 'game/base.html' %}
+
+{% block title %}Добавить рецепт - Сайт рецептов{% endblock %}
+
+{% block content %}
+<div class="add-recipe-container">
+    <h2>➕ Добавить новый рецепт</h2>
+    
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <form method="post" enctype="multipart/form-data" class="recipe-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>📋 Основная информация</h3>
+            
+            <div class="form-group">
+                <label for="{{ recipe_form.title.id_for_label }}">Название рецепта *</label>
+                {{ recipe_form.title }}
+                {% if recipe_form.title.errors %}
+                    <div class="error">{{ recipe_form.title.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ recipe_form.description.id_for_label }}">Описание *</label>
+                {{ recipe_form.description }}
+                {% if recipe_form.description.errors %}
+                    <div class="error">{{ recipe_form.description.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ recipe_form.category.id_for_label }}">Категория</label>
+                    {{ recipe_form.category }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ recipe_form.cooking_time.id_for_label }}">Время (мин) *</label>
+                    {{ recipe_form.cooking_time }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ recipe_form.servings.id_for_label }}">Порций *</label>
+                    {{ recipe_form.servings }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ recipe_form.image.id_for_label }}">Фото блюда *</label>
+                {{ recipe_form.image }}
+                {% if recipe_form.image.errors %}
+                    <div class="error">{{ recipe_form.image.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ recipe_form.author_name.id_for_label }}">Ваше имя *</label>
+                {{ recipe_form.author_name }}
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>📝 Ингредиенты</h3>
+            <p class="help-text">Добавьте ингредиенты для вашего рецепта</p>
+            
+            {{ ingredient_formset.management_form }}
+            <div id="ingredient-forms">
+                {% for form in ingredient_formset %}
+                    <div class="ingredient-form">
+                        {{ form.id }}
+                        <div class="form-row">
+                            <div class="form-group flex-2">
+                                <input type="text" name="{{ form.name.html_name }}" placeholder="Название ингредиента" class="form-control" value="{{ form.name.value|default:'' }}">
+                            </div>
+                            <div class="form-group flex-1">
+                                <input type="text" name="{{ form.quantity.html_name }}" placeholder="Количество" class="form-control" value="{{ form.quantity.value|default:'' }}">
+                            </div>
+                            <div class="form-group flex-1">
+                                <input type="text" name="{{ form.unit.html_name }}" placeholder="Ед. изм." class="form-control" value="{{ form.unit.value|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn-add-more" onclick="addIngredient()">+ Добавить ингредиент</button>
+        </div>
+        
+        <div class="form-section">
+            <h3>👨‍🍳 Шаги приготовления</h3>
+            <p class="help-text">Опишите процесс приготовления пошагово</p>
+            
+            {{ step_formset.management_form }}
+            <div id="step-forms">
+                {% for form in step_formset %}
+                    <div class="step-form">
+                        {{ form.id }}
+                        <div class="form-row">
+                            <div class="form-group" style="max-width: 100px;">
+                                <input type="number" name="{{ form.step_number.html_name }}" placeholder="№" class="form-control" value="{{ form.step_number.value|default:'' }}" min="1">
+                            </div>
+                            <div class="form-group flex-1">
+                                <textarea name="{{ form.instruction.html_name }}" placeholder="Описание шага" class="form-control" rows="2">{{ form.instruction.value|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn-add-more" onclick="addStep()">+ Добавить шаг</button>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">📤 Отправить рецепт</button>
+            <a href="{% url 'home' %}" class="btn-cancel">Отмена</a>
+        </div>
+        
+        <p class="info-text">
+            ℹ️ Ваш рецепт будет проверен модератором перед публикацией на сайте.
+        </p>
+    </form>
+</div>
+
+<script>
+let ingredientCount = {{ ingredient_formset.total_form_count }};
+let stepCount = {{ step_formset.total_form_count }};
+
+function addIngredient() {
+    const container = document.getElementById('ingredient-forms');
+    const newForm = document.createElement('div');
+    newForm.className = 'ingredient-form';
+    newForm.innerHTML = `
+        <div class="form-row">
+            <div class="form-group flex-2">
+                <input type="text" name="ingredients-${ingredientCount}-name" placeholder="Название ингредиента" class="form-control">
+            </div>
+            <div class="form-group flex-1">
+                <input type="text" name="ingredients-${ingredientCount}-quantity" placeholder="Количество" class="form-control">
+            </div>
+            <div class="form-group flex-1">
+                <input type="text" name="ingredients-${ingredientCount}-unit" placeholder="Ед. изм." class="form-control">
+            </div>
+        </div>
+    `;
+    container.appendChild(newForm);
+    ingredientCount++;
+    document.getElementById('id_ingredients-TOTAL_FORMS').value = ingredientCount;
+}
+
+function addStep() {
+    const container = document.getElementById('step-forms');
+    const newForm = document.createElement('div');
+    newForm.className = 'step-form';
+    newForm.innerHTML = `
+        <div class="form-row">
+            <div class="form-group" style="max-width: 100px;">
+                <input type="number" name="steps-${stepCount}-step_number" placeholder="№" class="form-control" value="${stepCount + 1}" min="1">
+            </div>
+            <div class="form-group flex-1">
+                <textarea name="steps-${stepCount}-instruction" placeholder="Описание шага" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+    `;
+    container.appendChild(newForm);
+    stepCount++;
+    document.getElementById('id_steps-TOTAL_FORMS').value = stepCount;
+}
+</script>
+{% endblock %}

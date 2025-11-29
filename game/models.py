@@ -25,6 +25,8 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(verbose_name='Время приготовления (мин)')
     servings = models.IntegerField(default=1, verbose_name='Количество порций')
     image = models.ImageField(upload_to='recipes/', verbose_name='Изображение блюда')
+    author_name = models.CharField(max_length=100, default='Аноним', verbose_name='Автор')
+    is_approved = models.BooleanField(default=False, verbose_name='Одобрен')
     likes = models.IntegerField(default=0, verbose_name='Лайки')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
