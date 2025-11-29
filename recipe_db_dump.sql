@@ -480,6 +480,7 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
+1	pbkdf2_sha256$1000000$5AJ9VXCWRmFva37zcHugWs$atbfeZs3rgB969fBCIhlKdhHykxSItQdRvd6DfYf6SY=	2025-11-29 18:07:34.965208+03	t	Adel				t	t	2025-11-29 18:06:19.447456+03
 \.
 
 
@@ -504,6 +505,9 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+1	2025-11-29 18:09:48.912283+03	1	Суп	1	[{"added": {}}, {"added": {"name": "\\u0418\\u043d\\u0433\\u0440\\u0435\\u0434\\u0438\\u0435\\u043d\\u0442", "object": "\\u041f\\u043e\\u0440\\u0435\\u0439 - 5 \\u041b\\u043e\\u043c\\u0442\\u0435\\u0439"}}, {"added": {"name": "\\u0428\\u0430\\u0433 \\u043f\\u0440\\u0438\\u0433\\u043e\\u0442\\u043e\\u0432\\u043b\\u0435\\u043d\\u0438\\u044f", "object": "\\u0428\\u0430\\u0433 1 - \\u0421\\u0443\\u043f"}}]	9	1
+2	2025-11-29 18:10:35.137217+03	2	Холодец	1	[{"added": {}}, {"added": {"name": "\\u0418\\u043d\\u0433\\u0440\\u0435\\u0434\\u0438\\u0435\\u043d\\u0442", "object": "\\u043c\\u044f\\u0441\\u043e - 1 \\u043a\\u0433"}}, {"added": {"name": "\\u0428\\u0430\\u0433 \\u043f\\u0440\\u0438\\u0433\\u043e\\u0442\\u043e\\u0432\\u043b\\u0435\\u043d\\u0438\\u044f", "object": "\\u0428\\u0430\\u0433 1 - \\u0425\\u043e\\u043b\\u043e\\u0434\\u0435\\u0446"}}]	9	1
+3	2025-11-29 18:11:18.150047+03	3	Пельмени	1	[{"added": {}}, {"added": {"name": "\\u0418\\u043d\\u0433\\u0440\\u0435\\u0434\\u0438\\u0435\\u043d\\u0442", "object": "\\u0442\\u0435\\u0441\\u0442\\u043e - 1 \\u043a\\u0433"}}, {"added": {"name": "\\u0428\\u0430\\u0433 \\u043f\\u0440\\u0438\\u0433\\u043e\\u0442\\u043e\\u0432\\u043b\\u0435\\u043d\\u0438\\u044f", "object": "\\u0428\\u0430\\u0433 1 - \\u041f\\u0435\\u043b\\u044c\\u043c\\u0435\\u043d\\u0438"}}]	9	1
 \.
 
 
@@ -560,6 +564,7 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+e5jkvgewfbs8a64rkiwud95bzfbjqer8	.eJxVjDsOwjAQBe_iGln2xl9Kes5g7fqDA8iW4qRC3B0ipYD2zcx7sYDbWsM28hLmxM5MstPvRhgfue0g3bHdOo-9rctMfFf4QQe_9pSfl8P9O6g46reO5KKwQJNAsG7yoIsxShmQhQwpW1SmgjlmLAJU9FanCZKRyTt0AJq9P9_-N9M:1vPMXu:sDLsg9yRo-tnTvlYXQgQTcq2MHHYHPyjy8mirWdv_fA	2025-12-13 18:07:34.968794+03
 \.
 
 
@@ -576,6 +581,9 @@ COPY public.game_comment (id, author_name, text, created_at, recipe_id) FROM std
 --
 
 COPY public.game_cookingstep (id, step_number, instruction, recipe_id) FROM stdin;
+1	1	Порезать	1
+2	1	Порезать мясо	2
+3	1	Порезать пельмени	3
 \.
 
 
@@ -584,6 +592,9 @@ COPY public.game_cookingstep (id, step_number, instruction, recipe_id) FROM stdi
 --
 
 COPY public.game_ingredient (id, name, quantity, unit, recipe_id) FROM stdin;
+1	Порей	5	Ломтей	1
+2	мясо	1	кг	2
+3	тесто	1	кг	3
 \.
 
 
@@ -592,6 +603,9 @@ COPY public.game_ingredient (id, name, quantity, unit, recipe_id) FROM stdin;
 --
 
 COPY public.game_recipe (id, title, description, cooking_time, servings, image, created_at, updated_at, likes) FROM stdin;
+1	Суп	Суп	20	1	recipes/images.jpg	2025-11-29 18:09:48.583156+03	2025-11-29 18:09:48.583176+03	0
+2	Холодец	Холодец	30	1	recipes/Без_имени1.jpg	2025-11-29 18:10:35.133251+03	2025-11-29 18:10:35.133269+03	0
+3	Пельмени	Пель	60	1	recipes/Без_имени.jpg	2025-11-29 18:11:18.144484+03	2025-11-29 18:11:18.1445+03	0
 \.
 
 
@@ -627,7 +641,7 @@ SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 1, false);
+SELECT pg_catalog.setval('public.auth_user_id_seq', 1, true);
 
 
 --
@@ -641,7 +655,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 3, true);
 
 
 --
@@ -669,21 +683,21 @@ SELECT pg_catalog.setval('public.game_comment_id_seq', 1, false);
 -- Name: game_cookingstep_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.game_cookingstep_id_seq', 1, false);
+SELECT pg_catalog.setval('public.game_cookingstep_id_seq', 3, true);
 
 
 --
 -- Name: game_ingredient_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.game_ingredient_id_seq', 1, false);
+SELECT pg_catalog.setval('public.game_ingredient_id_seq', 3, true);
 
 
 --
 -- Name: game_recipe_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.game_recipe_id_seq', 1, false);
+SELECT pg_catalog.setval('public.game_recipe_id_seq', 3, true);
 
 
 --

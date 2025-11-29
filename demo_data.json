@@ -1,2 +1,101 @@
 [
+{
+    "model": "game.recipe",
+    "pk": 1,
+    "fields": {
+        "title": "Суп",
+        "description": "Суп",
+        "cooking_time": 20,
+        "servings": 1,
+        "image": "recipes/images.jpg",
+        "likes": 0,
+        "created_at": "2025-11-29T15:09:48.583Z",
+        "updated_at": "2025-11-29T15:09:48.583Z"
+    }
+},
+{
+    "model": "game.recipe",
+    "pk": 2,
+    "fields": {
+        "title": "Холодец",
+        "description": "Холодец",
+        "cooking_time": 30,
+        "servings": 1,
+        "image": "recipes/Без_имени1.jpg",
+        "likes": 0,
+        "created_at": "2025-11-29T15:10:35.133Z",
+        "updated_at": "2025-11-29T15:10:35.133Z"
+    }
+},
+{
+    "model": "game.recipe",
+    "pk": 3,
+    "fields": {
+        "title": "Пельмени",
+        "description": "Пель",
+        "cooking_time": 60,
+        "servings": 1,
+        "image": "recipes/Без_имени.jpg",
+        "likes": 0,
+        "created_at": "2025-11-29T15:11:18.144Z",
+        "updated_at": "2025-11-29T15:11:18.144Z"
+    }
+},
+{
+    "model": "game.ingredient",
+    "pk": 1,
+    "fields": {
+        "recipe": 1,
+        "name": "Порей",
+        "quantity": "5",
+        "unit": "Ломтей"
+    }
+},
+{
+    "model": "game.ingredient",
+    "pk": 2,
+    "fields": {
+        "recipe": 2,
+        "name": "мясо",
+        "quantity": "1",
+        "unit": "кг"
+    }
+},
+{
+    "model": "game.ingredient",
+    "pk": 3,
+    "fields": {
+        "recipe": 3,
+        "name": "тесто",
+        "quantity": "1",
+        "unit": "кг"
+    }
+},
+{
+    "model": "game.cookingstep",
+    "pk": 1,
+    "fields": {
+        "recipe": 1,
+        "step_number": 1,
+        "instruction": "Порезать"
+    }
+},
+{
+    "model": "game.cookingstep",
+    "pk": 2,
+    "fields": {
+        "recipe": 2,
+        "step_number": 1,
+        "instruction": "Порезать мясо"
+    }
+},
+{
+    "model": "game.cookingstep",
+    "pk": 3,
+    "fields": {
+        "recipe": 3,
+        "step_number": 1,
+        "instruction": "Порезать пельмени"
+    }
+}
 ]
