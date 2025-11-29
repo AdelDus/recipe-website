@@ -8,6 +8,7 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(verbose_name='Время приготовления (мин)')
     servings = models.IntegerField(default=1, verbose_name='Количество порций')
     image = models.ImageField(upload_to='recipes/', verbose_name='Изображение блюда')
+    likes = models.IntegerField(default=0, verbose_name='Лайки')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
@@ -48,3 +49,19 @@ class CookingStep(models.Model):
 
     def __str__(self):
         return f"Шаг {self.step_number} - {self.recipe.title}"
+
+
+class Comment(models.Model):
+    """Модель комментария"""
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments', verbose_name='Рецепт')
+    author_name = models.CharField(max_length=100, verbose_name='Имя автора')
+    text = models.TextField(verbose_name='Текст комментария')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.author_name} - {self.recipe.title}"

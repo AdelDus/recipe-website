@@ -39,8 +39,15 @@
         padding: 0 15px 15px;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         color: #666;
         font-size: 0.9em;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .recipe-info .likes {
+        color: #e74c3c;
+        font-weight: bold;
     }
     h2 {
         color: #333;
@@ -60,6 +67,7 @@
             <div class="recipe-info">
                 <span class="cooking-time">⏱️ {{ recipe.cooking_time }} мин</span>
                 <span class="servings">🍽️ {{ recipe.servings }} порций</span>
+                <span class="likes">❤️ {{ recipe.likes }}</span>
             </div>
         </div>
     {% empty %}

@@ -40,6 +40,19 @@
 **Связи:**
 - Many-to-One с Recipe (один рецепт может иметь много шагов)
 
+### 4. Comment (Комментарий)
+Модель для хранения комментариев пользователей.
+
+**Поля:**
+- `id` (PK) - Первичный ключ
+- `recipe_id` (FK) - Внешний ключ на Recipe
+- `author_name` - Имя автора комментария (CharField, max_length=100)
+- `text` - Текст комментария (TextField)
+- `created_at` - Дата создания (DateTimeField, auto_now_add=True)
+
+**Связи:**
+- Many-to-One с Recipe (один рецепт может иметь много комментариев)
+
 ## Визуальная диаграмма
 
 ```
@@ -52,23 +65,24 @@
 │ cooking_time                        │
 │ servings                            │
 │ image                               │
+│ likes                               │
 │ created_at                          │
 │ updated_at                          │
 └─────────────────────────────────────┘
-         │                    │
-         │ 1                  │ 1
-         │                    │
-         │ N                  │ N
-         ▼                    ▼
-┌──────────────────┐   ┌──────────────────┐
-│   Ingredient     │   │  CookingStep     │
-├──────────────────┤   ├──────────────────┤
-│ id (PK)          │   │ id (PK)          │
-│ recipe_id (FK)   │   │ recipe_id (FK)   │
-│ name             │   │ step_number      │
-│ quantity         │   │ instruction      │
-│ unit             │   │                  │
-└──────────────────┘   └──────────────────┘
+         │              │            │
+         │ 1            │ 1          │ 1
+         │              │            │
+         │ N            │ N          │ N
+         ▼              ▼            ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ Ingredient   │ │ CookingStep  │ │  Comment     │
+├──────────────┤ ├──────────────┤ ├──────────────┤
+│ id (PK)      │ │ id (PK)      │ │ id (PK)      │
+│ recipe_id(FK)│ │ recipe_id(FK)│ │ recipe_id(FK)│
+│ name         │ │ step_number  │ │ author_name  │
+│ quantity     │ │ instruction  │ │ text         │
+│ unit         │ │              │ │ created_at   │
+└──────────────┘ └──────────────┘ └──────────────┘
 ```
 
 ## Связи между таблицами
